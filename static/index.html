@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI News Hub</title>
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#4f46e5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AI News">
+<meta name="description" content="The latest AI news and practical lifehacks from around the world.">
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --text: #1a1d23; --muted: #667085; --line: #e4e7ec;
+    --accent: #4f46e5; --accent-soft: #eef2ff; --hack: #b45309; --hack-soft: #fef3c7;
+    --new: #059669; --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1115; --card: #171a21; --text: #e6e8ec; --muted: #98a2b3; --line: #262b35;
+      --accent: #818cf8; --accent-soft: #1e1f3a; --hack: #fbbf24; --hack-soft: #2d2410; --new: #34d399;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent);
+           backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  .top { display: flex; align-items: center; gap: 12px; padding: 14px 0 10px; }
+  h1 { font-size: 20px; margin: 0; letter-spacing: -.02em; }
+  .meta { color: var(--muted); font-size: 13px; margin-left: auto; text-align: right; }
+  button, select, input { font: inherit; color: inherit; }
+  .btn { border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 7px 12px; cursor: pointer; }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+  .tab { border: 0; background: transparent; padding: 6px 12px; border-radius: 999px; cursor: pointer; color: var(--muted); white-space: nowrap; }
+  .tab.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .tab .n { font-size: 12px; opacity: .7; margin-left: 4px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px 0 6px; align-items: center; }
+  .search { flex: 1 1 240px; min-width: 0; border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px 12px; }
+  select { border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px 10px; }
+  label.toggle { display: flex; gap: 6px; align-items: center; color: var(--muted); font-size: 14px; cursor: pointer; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 0 12px; }
+  .chip { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 3px 10px; font-size: 13px; cursor: pointer; color: var(--muted); }
+  .chip.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .banner { background: var(--hack-soft); color: var(--text); border-radius: var(--radius); padding: 12px 14px; margin: 4px 0 14px; font-size: 14px; }
+  .banner b { color: var(--hack); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: 14px; padding-bottom: 40px; }
+  .card { min-width: 0; overflow-wrap: anywhere; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px;
+          display: flex; flex-direction: column; gap: 8px; transition: border-color .15s; }
+  .card:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+  .card.read { opacity: .55; }
+  .card img { width: 100%; height: 150px; object-fit: cover; border-radius: 10px; background: var(--line); }
+  .row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+  .src { font-weight: 600; color: var(--text); }
+  .dot-new { color: var(--new); font-weight: 700; }
+  .card h3 { margin: 0; font-size: 16px; line-height: 1.35; }
+  .card h3 a { color: inherit; text-decoration: none; }
+  .card h3 a:hover { color: var(--accent); }
+  .sum { margin: 0; color: var(--muted); font-size: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: auto; align-items: center; }
+  .tag { font-size: 11.5px; padding: 2px 8px; border-radius: 999px; background: var(--bg); color: var(--muted); }
+  .tag.hack { background: var(--hack-soft); color: var(--hack); font-weight: 600; }
+  .star { margin-left: auto; border: 0; background: none; cursor: pointer; font-size: 18px; color: var(--muted); padding: 0 2px; }
+  .star.on { color: #f59e0b; }
+  .empty { text-align: center; color: var(--muted); padding: 60px 0; grid-column: 1 / -1; }
+  footer { color: var(--muted); font-size: 12.5px; padding: 0 0 40px; }
+  footer .err { color: #dc2626; }
+  @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } .meta span.long { display: none; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top">
+      <h1>⚡ AI News Hub</h1>
+      <div class="meta"><span id="updated">Loading…</span></div>
+      <button class="btn primary" id="refresh">Refresh</button>
+    </div>
+    <nav class="tabs" id="tabs"></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="controls">
+    <input class="search" id="q" type="search" placeholder="Search titles & summaries… (e.g. prompt, agent, Gemini)">
+    <select id="range">
+      <option value="1">Last 24 hours</option>
+      <option value="3">Last 3 days</option>
+      <option value="7" selected>Last 7 days</option>
+      <option value="30">Last 30 days</option>
+      <option value="0">All time</option>
+    </select>
+    <label class="toggle"><input type="checkbox" id="hideRead"> Hide read</label>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div id="banner"></div>
+  <section class="grid" id="grid"></section>
+  <footer id="sources"></footer>
+</main>
+
+<script>
+const TABS = [
+  ["all", "All"], ["lifehack", "💡 Lifehacks"], ["labs", "AI Labs"], ["news", "News"],
+  ["practical", "Practical"], ["community", "Community"], ["saved", "★ Saved"],
+];
+const TOPICS = ["Models", "Tools & Apps", "Agents", "Coding", "Images & Video", "Policy & Safety", "Business", "Research", "Hardware"];
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("ainews." + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("ainews." + k, JSON.stringify(v)); } catch {} },
+};
+
+const state = {
+  items: [], sources: [], fetchedAt: 0,
+  tab: store.get("tab", "all"), topic: null, q: "",
+  range: store.get("range", "7"), hideRead: store.get("hideRead", false),
+  saved: store.get("saved", {}),           // id -> item
+  read: new Set(store.get("read", [])),
+  lastVisit: store.get("lastVisit", 0),
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function ago(ts) {
+  if (!ts) return "";
+  const s = Date.now() / 1000 - ts;
+  if (s < 3600) return Math.max(1, Math.round(s / 60)) + "m ago";
+  if (s < 86400) return Math.round(s / 3600) + "h ago";
+  if (s < 86400 * 7) return Math.round(s / 86400) + "d ago";
+  return new Date(ts * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+let loading = false, loadError = "", isStatic = false;
+async function load(force = false) {
+  loading = true; loadError = "";
+  $("refresh").disabled = true;
+  $("refresh").textContent = force ? "Fetching…" : "Loading…";
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      // Local server: /api/news (live fetch). Hosted site: news.json (rebuilt every 3 hours).
+      let res = isStatic ? null : await fetch("/api/news" + (force && attempt === 0 ? "?refresh=1" : ""), { cache: "no-store" }).catch(() => null);
+      if (!res || !res.ok) { isStatic = true; res = await fetch("news.json?t=" + Date.now(), { cache: "no-store" }); }
+      const data = await res.json();
+      state.items = data.items; state.sources = data.sources; state.fetchedAt = data.fetched_at;
+      loadError = "";
+      break;
+    } catch (e) {
+      loadError = "Could not reach the server. Is server.py running?";
+      await new Promise(r => setTimeout(r, 800));
+    }
+  }
+  loading = false;
+  $("refresh").disabled = false;
+  $("refresh").textContent = "Refresh";
+  render();
+}
+
+function baseList() {
+  if (state.tab === "saved") return Object.values(state.saved).sort((a, b) => b.date - a.date);
+  let list = state.items;
+  if (state.tab === "lifehack") list = list.filter(i => i.lifehack);
+  else if (state.tab !== "all") list = list.filter(i => i.category === state.tab);
+  return list;
+}
+
+function filtered() {
+  let list = baseList();
+  const days = +state.range;
+  if (days && state.tab !== "saved") {
+    const cutoff = Date.now() / 1000 - days * 86400;
+    list = list.filter(i => i.date >= cutoff);
+  }
+  if (state.topic) list = list.filter(i => i.topics.includes(state.topic));
+  if (state.q) {
+    const words = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+    list = list.filter(i => { const t = (i.title + " " + i.summary + " " + i.source).toLowerCase(); return words.every(w => t.includes(w)); });
+  }
+  if (state.hideRead) list = list.filter(i => !state.read.has(i.id));
+  return list;
+}
+
+function render() {
+  // tabs with counts
+  const counts = { all: state.items.length, lifehack: state.items.filter(i => i.lifehack).length, saved: Object.keys(state.saved).length };
+  for (const c of ["labs", "news", "practical", "community"]) counts[c] = state.items.filter(i => i.category === c).length;
+  $("tabs").innerHTML = TABS.map(([k, l]) =>
+    `<button class="tab ${state.tab === k ? "active" : ""}" data-tab="${k}">${l}<span class="n">${counts[k] ?? ""}</span></button>`).join("");
+
+  $("chips").innerHTML = TOPICS.map(t => `<button class="chip ${state.topic === t ? "active" : ""}" data-topic="${esc(t)}">${esc(t)}</button>`).join("");
+
+  // header meta
+  const newCount = state.items.filter(i => i.date > state.lastVisit).length;
+  $("updated").innerHTML = state.fetchedAt
+    ? `<span class="long">${state.items.length} stories · updated </span>${ago(state.fetchedAt)}${state.lastVisit && newCount ? ` · <span class="dot-new">${newCount} new</span>` : ""}`
+    : (loadError || "Loading…");
+  if (loadError && state.fetchedAt) $("updated").innerHTML += ` · <span style="color:#dc2626">offline</span>`;
+
+  $("banner").innerHTML = state.tab === "lifehack"
+    ? `<div class="banner"><b>Lifehacks</b> collects practical, actionable pieces — how-tos, prompting tips, workflows, new features you can try today — plus everything from hands-on writers like Simon Willison and Ethan Mollick. Star ★ the ones you want to try.</div>` : "";
+
+  const list = filtered();
+  $("grid").innerHTML = list.length ? list.slice(0, 300).map(card).join("")
+    : `<div class="empty">${state.tab === "saved" ? "No saved stories yet. Tap ★ on any card to keep it here." : "Nothing matches. Try a wider time range or clear the filters."}</div>`;
+
+  const ok = state.sources.filter(s => !s.error);
+  const bad = state.sources.filter(s => s.error);
+  $("sources").innerHTML = state.sources.length
+    ? `Sources (${ok.length}/${state.sources.length}): ${state.sources.map(s => s.error ? `<span class="err" title="${esc(s.error)}">${esc(s.name)} ✕</span>` : `${esc(s.name)} (${s.count})`).join(" · ")}`
+      + (bad.length ? `<br>Sources marked ✕ failed this time and will be retried on the next refresh.` : "")
+    : "";
+}
+
+function card(i) {
+  const isNew = state.lastVisit && i.date > state.lastVisit;
+  const saved = !!state.saved[i.id];
+  return `<article class="card ${state.read.has(i.id) ? "read" : ""}">
+    ${i.image ? `<img src="${esc(i.image)}" alt="" loading="lazy" onerror="this.remove()">` : ""}
+    <div class="row"><span class="src">${esc(i.source)}</span><span>${ago(i.date)}</span>${isNew ? `<span class="dot-new">● NEW</span>` : ""}</div>
+    <h3><a href="${esc(i.link)}" target="_blank" rel="noopener" data-open="${esc(i.id)}">${esc(i.title)}</a></h3>
+    ${i.summary ? `<p class="sum">${esc(i.summary)}</p>` : ""}
+    <div class="tags">
+      ${i.lifehack ? `<span class="tag hack">💡 Lifehack</span>` : ""}
+      ${i.topics.map(t => `<span class="tag">${esc(t)}</span>`).join("")}
+      <button class="star ${saved ? "on" : ""}" data-save="${esc(i.id)}" title="${saved ? "Remove from saved" : "Save for later"}">${saved ? "★" : "☆"}</button>
+    </div>
+  </article>`;
+}
+
+function findItem(id) { return state.items.find(i => i.id === id) || state.saved[id]; }
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-tab],[data-topic],[data-save],[data-open]");
+  if (!t) return;
+  if (t.dataset.tab) { state.tab = t.dataset.tab; store.set("tab", state.tab); render(); }
+  else if (t.dataset.topic) { state.topic = state.topic === t.dataset.topic ? null : t.dataset.topic; render(); }
+  else if (t.dataset.save) {
+    const id = t.dataset.save;
+    if (state.saved[id]) delete state.saved[id]; else state.saved[id] = findItem(id);
+    store.set("saved", state.saved); render();
+  } else if (t.dataset.open) {
+    state.read.add(t.dataset.open);
+    store.set("read", [...state.read].slice(-3000));
+    setTimeout(render, 300);
+  }
+});
+$("q").addEventListener("input", e => { state.q = e.target.value.trim(); render(); });
+$("range").value = state.range;
+$("range").addEventListener("change", e => { state.range = e.target.value; store.set("range", state.range); render(); });
+$("hideRead").checked = state.hideRead;
+$("hideRead").addEventListener("change", e => { state.hideRead = e.target.checked; store.set("hideRead", state.hideRead); render(); });
+$("refresh").addEventListener("click", () => load(true));
+addEventListener("beforeunload", () => store.set("lastVisit", Math.floor(Date.now() / 1000)));
+setInterval(render, 60000); // keep "x min ago" fresh
+
+load();
+</script>
+</body>
+</html>
